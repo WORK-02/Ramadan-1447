@@ -1,119 +1,533 @@
-<script>
-    // ... الكود الخاص بالنجوم وتأثير التمرير (Intersection Observer) هنا ...
 
-    const starsContainer = document.getElementById('stars');
-    for (let i = 0; i < 100; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.width = Math.random() * 3 + 'px';
-        star.style.height = star.style.width;
-        star.style.left = Math.random() * 100 + '%';
-        star.style.top = Math.random() * 100 + '%';
-        star.style.animationDelay = Math.random() * 3 + 's';
-        starsContainer.appendChild(star);
-    }
-
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, observerOptions);
-
-    document.querySelectorAll('.fade-in').forEach(el => {
-        observer.observe(el);
-    });
-
-    document.querySelectorAll('.program-card').forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = (y - centerY) / 10;
-            const rotateY = (centerX - x) / 10;
-            
-            card.style.transform = `translateY(-15px) scale(1.02) perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = '';
-        });
-    });
-
-    const ctaButton = document.querySelector('.cta-button');
-    setInterval(() => {
-        ctaButton.style.transform = 'scale(1.05)';
-        setTimeout(() => {
-            ctaButton.style.transform = 'scale(1)';
-        }, 200);
-    }, 3000);
-
-    // ------------------------------------------------------------------
-    // 💡 التعديل الجديد: إضافة عداد تنازلي حقيقي لرمضان 1447 هـ (23 فبراير 2026)
-    // ------------------------------------------------------------------
-
-    function updateCountdown() {
-        // تاريخ بداية رمضان المتوقع (يجب التأكد من التاريخ الهجري المقابل)
-        // استخدام تاريخ 23 فبراير 2026 كتقدير تقريبي
-        const ramadanDate = new Date("Feb 23, 2026 00:00:00").getTime();
-        const now = new Date().getTime();
-        const distance = ramadanDate - now;
-
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        const countdownElement = document.getElementById("countdown");
-
-        if (distance < 0) {
-            clearInterval(countdownInterval);
-            countdownElement.innerHTML = "🌙 بدأ رمضان! تقبل الله طاعاتكم";
-            countdownElement.style.color = 'var(--primary-gold)';
-            countdownElement.style.textShadow = '0 0 30px rgba(212, 175, 55, 0.8)';
-            return;
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رمضان 1447هـ - موسم الإنطلاق</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;900&family=Tajawal:wght@400;500;700&family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gold: #D4AF37;
+            --deep-purple: #2D1B4E;
+            --accent-teal: #00BFA5;
+            --warm-orange: #FF6B35;
+            --night-sky: #0A0E27;
+            --soft-cream: #FFF8E7;
+            --glow-green: #39FF14;
         }
 
-        countdownElement.innerHTML = 
-            `<span class="unit">${days}</span> <small>يوم</small> : ` + 
-            `<span class="unit">${hours}</span> <small>ساعة</small> : ` + 
-            `<span class="unit">${minutes}</span> <small>دقيقة</small> : ` + 
-            `<span class="unit">${seconds}</span> <small>ثانية</small>`;
-    }
-
-    // إضافة تنسيق CSS إضافي لتمييز الأرقام في العداد
-    const styleSheet = document.createElement("style");
-    styleSheet.innerHTML = `
-        .countdown-numbers .unit {
-            font-size: 3rem; 
-            font-weight: 900;
-            color: var(--glow-green);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .countdown-numbers small {
-            font-size: 0.9rem;
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, var(--night-sky) 0%, var(--deep-purple) 100%);
             color: var(--soft-cream);
-            margin-inline-start: 5px;
+            overflow-x: hidden;
+            position: relative;
         }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 20px 60px;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '☪';
+            position: absolute;
+            top: 20px;
+            right: 50%;
+            transform: translateX(50%);
+            font-size: 100px;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(50%) translateY(0); }
+            50% { transform: translateX(50%) translateY(-20px); }
+        }
+
+        .hero h1 {
+            font-family: 'Cairo', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary-gold), var(--accent-teal), var(--primary-gold));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .hero .subtitle {
+            font-family: 'Amiri', serif;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: var(--accent-teal);
+            margin-bottom: 15px;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .hero .tagline {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            color: var(--soft-cream);
+            opacity: 0.9;
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .countdown-bar {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(0, 191, 165, 0.2));
+            border: 2px solid var(--primary-gold);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 40px auto;
+            max-width: 800px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.2);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .countdown-bar h3 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.8rem;
+            color: var(--primary-gold);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .countdown-numbers {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--glow-green);
+            text-shadow: 0 0 30px var(--glow-green);
+            letter-spacing: 5px;
+        }
+
+        .programs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+            padding: 0 20px;
+        }
+
+        .program-card {
+            background: linear-gradient(135deg, rgba(45, 27, 78, 0.8), rgba(10, 14, 39, 0.8));
+            border: 2px solid transparent;
+            border-radius: 25px;
+            padding: 35px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .program-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+        }
+
+        .program-card:hover::before {
+            transform: rotate(45deg) translate(50%, 50%);
+        }
+
+        .program-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            border-color: var(--primary-gold);
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.4);
+        }
+
+        .program-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+            text-align: center;
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+        }
+
+        .program-card h3 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.8rem;
+            color: var(--primary-gold);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .program-card p {
+            color: var(--soft-cream);
+            line-height: 1.8;
+            text-align: center;
+            opacity: 0.9;
+            font-size: 1.05rem;
+        }
+
+        .features {
+            margin: 80px 0;
+            text-align: center;
+        }
+
+        .features h2 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 3rem;
+            color: var(--primary-gold);
+            margin-bottom: 50px;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        .feature-item {
+            background: linear-gradient(135deg, rgba(0, 191, 165, 0.15), rgba(45, 27, 78, 0.15));
+            border: 2px solid var(--accent-teal);
+            border-radius: 20px;
+            padding: 40px 25px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-item:hover {
+            background: linear-gradient(135deg, rgba(0, 191, 165, 0.25), rgba(45, 27, 78, 0.25));
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 191, 165, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px rgba(0, 191, 165, 0.5));
+        }
+
+        .feature-item h4 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.5rem;
+            color: var(--accent-teal);
+            margin-bottom: 10px;
+        }
+
+        .feature-item p {
+            color: var(--soft-cream);
+            opacity: 0.9;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin: 80px 0;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(212, 175, 55, 0.2));
+            border-radius: 30px;
+            border: 2px solid var(--warm-orange);
+            backdrop-filter: blur(10px);
+        }
+
+        .cta-section h2 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary-gold);
+            margin-bottom: 30px;
+            text-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--warm-orange), var(--primary-gold));
+            color: white;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 20px 60px;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(255, 107, 53, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 60px rgba(255, 107, 53, 0.6);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 80px;
+            border-top: 2px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .footer p {
+            color: var(--soft-cream);
+            opacity: 0.9;
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         @media (max-width: 768px) {
-            .countdown-numbers .unit { font-size: 2rem; }
-            .countdown-numbers small { font-size: 0.7rem; }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .programs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .countdown-numbers {
+                font-size: 2rem;
+            }
         }
-    `;
-    document.head.appendChild(styleSheet);
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
 
+    <div class="container">
+        <div class="hero">
+            <h1>🌙 رمضان 1447 🌙</h1>
+            <p class="subtitle">ربيع القرآن وموسم التحديات والإبداع</p>
+            <p class="tagline">برامج استثنائية في انتظاركم</p>
+        </div>
 
-    // تحديث العداد كل ثانية
-    const countdownInterval = setInterval(updateCountdown, 1000);
-    // تحديث فوري عند التحميل
-    updateCountdown(); 
-</script>
+        <div class="countdown-bar fade-in">
+            <h3>⏰ استعدوا لموسم استثنائي</h3>
+            <div class="countdown-numbers" style="font-size: 2rem;">رمضان على الأبواب</div>
+        </div>
+
+        <div class="programs-grid">
+            <div class="program-card fade-in">
+                <span class="program-icon">📖</span>
+                <h3>برامج قرآنية</h3>
+                <p>الأمسية القرآنية الكبرى وختمات جماعية</p>
+            </div>
+
+            <div class="program-card fade-in">
+                <span class="program-icon">⛺</span>
+                <h3>اعتكافات تربوية</h3>
+                <p>تجربة روحانية فريدة للأشبال والشباب</p>
+            </div>
+
+            <div class="program-card fade-in">
+                <span class="program-icon">🏆</span>
+                <h3>مسابقات مشوقة</h3>
+                <p>مسابقات قرآنية بجوائز قيمة</p>
+            </div>
+
+            <div class="program-card fade-in">
+                <span class="program-icon">🚌</span>
+                <h3>رحلات ترفيهية</h3>
+                <p>رحلات رمضانية + رحلة المدينة المنورة</p>
+            </div>
+
+            <div class="program-card fade-in">
+                <span class="program-icon">✨</span>
+                <h3>إحياء ليلة القدر</h3>
+                <p>برامج خاصة بأجواء روحانية استثنائية</p>
+            </div>
+
+            <div class="program-card fade-in">
+                <span class="program-icon">🎊</span>
+                <h3>حفل ختامي</h3>
+                <p>تكريم المتميزين وتوزيع الجوائز</p>
+            </div>
+        </div>
+
+        <div class="features fade-in">
+            <h2>✨ لماذا تنضم إلينا؟</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🎁</div>
+                    <h4>جوائز قيّمة</h4>
+                    <p>مسابقات بجوائز مميزة</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">🌟</div>
+                    <h4>اغتنام الأجر</h4>
+                    <p>فرصة لمضاعفة الحسنات</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">🎨</div>
+                    <h4>تنمية المواهب</h4>
+                    <p>اكتشف وطوّر قدراتك</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">🔥</div>
+                    <h4>كسر الروتين</h4>
+                    <p>برامج مبتكرة ومختلفة</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">👥</div>
+                    <h4>لجميع الفئات</h4>
+                    <p>من الابتدائي للجامعيين</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">💪</div>
+                    <h4>كوادر محترفة</h4>
+                    <p>فريق متميز ومتخصص</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-section fade-in">
+            <h2>🚀 كن جزءاً من التغيير!</h2>
+            <p style="font-size: 1.3rem; color: var(--soft-cream); margin-bottom: 30px;">
+                رمضان على الأبواب - لا تفوّت الفرصة
+            </p>
+            <a href="#" class="cta-button">انضم الآن 🌙</a>
+        </div>
+
+        <div class="footer fade-in">
+            <p style="font-size: 1.5rem; color: var(--primary-gold); font-family: 'Cairo', sans-serif; font-weight: 700;">
+                "إِنَّا أَنزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ"
+            </p>
+            <p>شهر الخير والبركة ينتظرك</p>
+            <p style="margin-top: 30px; opacity: 0.6;">برامج رمضان 1447هـ</p>
+        </div>
+    </div>
+
+    <script>
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        document.querySelectorAll('.program-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+                
+                card.style.transform = `translateY(-15px) scale(1.02) perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
+        });
+
+        const ctaButton = document.querySelector('.cta-button');
+        setInterval(() => {
+            ctaButton.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                ctaButton.style.transform = 'scale(1)';
+            }, 200);
+        }, 3000);
+    </script>
+</body>
+</html>
