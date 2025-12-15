@@ -168,11 +168,18 @@
             font-size: 3rem; 
             font-weight: 900;
             color: var(--glow-green);
+            display: inline-block; /* لضمان أن كل رقم ووحدته يتم التعامل معهما كوحدة واحدة */
         }
         .countdown-numbers small {
             font-size: 0.9rem;
             color: var(--soft-cream);
             margin-inline-start: 5px;
+            display: block; /* لجعل الوحدة تظهر تحت الرقم على سطر جديد */
+            line-height: 1.2;
+        }
+        .countdown-numbers > div {
+            display: inline-block;
+            margin: 0 15px;
         }
 
         .programs-grid {
@@ -371,6 +378,9 @@
             .countdown-numbers small { 
                 font-size: 0.7rem; 
             }
+            .countdown-numbers > div {
+                margin: 0 10px;
+            }
         }
     </style>
 </head>
@@ -465,7 +475,7 @@
                     <p>فريق متميز ومتخصص</p>
                 </div>
             </div>
-                    </div>
+        </div>
 
         <div class="cta-section fade-in">
             <h2>🚀 كن جزءاً من التغيير!</h2>
@@ -543,12 +553,11 @@
         }, 3000);
 
         // ------------------------------------------------------------------
-        // 💡 التعديل الجديد: إضافة عداد تنازلي حقيقي لرمضان 1447 هـ (23 فبراير 2026)
+        // 💡 التعديل الجديد: دالة العداد التنازلي الحقيقي لرمضان 1447 هـ
         // ------------------------------------------------------------------
 
         function updateCountdown() {
-            // تاريخ بداية رمضان المتوقع (يجب التأكد من التاريخ الهجري المقابل)
-            // استخدام تاريخ 23 فبراير 2026 كتقدير تقريبي
+            // تاريخ بداية رمضان المتوقع: 23 فبراير 2026 
             const ramadanDate = new Date("Feb 23, 2026 00:00:00").getTime();
             const now = new Date().getTime();
             const distance = ramadanDate - now;
@@ -568,19 +577,18 @@
                 return;
             }
 
-            // عرض الأرقام بتنسيق (يوم:ساعة:دقيقة:ثانية) مع تسمية الوحدات
+            // عرض الأرقام بتنسيق مقسم وواضح
             countdownElement.innerHTML = 
-                `<span class="unit">${days}</span> <small>يوم</small> : ` + 
-                `<span class="unit">${hours}</span> <small>ساعة</small> : ` + 
-                `<span class="unit">${minutes}</span> <small>دقيقة</small> : ` + 
-                `<span class="unit">${seconds}</span> <small>ثانية</small>`;
+                `<div><span class="unit">${days}</span> <small>يوم</small></div>` + 
+                `<div><span class="unit">${hours}</span> <small>ساعة</small></div>` + 
+                `<div><span class="unit">${minutes}</span> <small>دقيقة</small></div>` + 
+                `<div><span class="unit">${seconds}</span> <small>ثانية</small></div>`;
         }
 
         // تحديث العداد كل ثانية
         const countdownInterval = setInterval(updateCountdown, 1000);
         // تحديث فوري عند التحميل
         updateCountdown(); 
-
     </script>
 </body>
 </html>
